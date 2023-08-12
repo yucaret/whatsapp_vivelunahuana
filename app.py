@@ -53,30 +53,25 @@ def recibir_mensajes():
         ###################################################
         # Agregando chatgpt mensaje
         ###################################################
-        # 2023-07-30 21:06 (jorge eduardo vicente hernández): con la palabra conforme ingresa
-        #if 'es todo' in text:
-        #    print('es todo')
-        #    services.guardar_conversacion(messageId, number, name, text, timestamp, 'pedido realizado')
-        if 'conforme' in str.lower(text):
-            services.guardar_conversacion(messageId, number, name, text, timestamp, 'conformidad')
+        respuestabot = services.generar_respuesta_chatgpt(text, number, False)
+        print("dentro de recibir_mensajes: respuestabot = " + str(respuestabot))
+        services.guardar_conversacion(messageId, number, name, text, timestamp, respuestabot)
+        data = services.text_Message(number,respuestabot)
 
-            # 2023-07-30 21:06 (jorge eduardo vicente hernández): renombre de variable
-            #jsonPedido = services.generar_respuesta_chatgpt(text, number, True)
-            #print('1jsonPedido',jsonPedido)
+        if 'buena elección' in str.lower(text):
+            print("interesado")
             diccionarioConforme = services.generar_respuesta_chatgpt(text, number, True)
-            
-            # 2023-07-30 21:06 (jorge eduardo vicente hernández): se envia mensaje al gerente
-            #services.guardar_pedido(jsonPedido, number)
-            #data = services.text_Message(number,'Pedido Confirmado, gracias!')
-            dataGerente = services.text_Message_al_gerente(sett.celular_gerente, diccionarioConforme)
+            dataGerente = services.text_Message_al_gerente(sett.celular_gerente, name, number, diccionarioConforme, "interesado")
             respuesta = services.enviar_Mensaje_whatsapp(dataGerente)
-            
-            data = services.text_Message(number,'Gracias en breve se comunicarán contigo!!!')
-        else:
-            respuestabot = services.generar_respuesta_chatgpt(text, number, False)
-            print("dentro de recibir_mensajes: respuestabot = " + str(respuestabot))
-            services.guardar_conversacion(messageId, number, name, text, timestamp, respuestabot)
-            data = services.text_Message(number,respuestabot)
+
+        if 'momento por favor' in str.lower(text):
+            print("posiblemente interesado")
+            diccionarioConforme = services.generar_respuesta_chatgpt(text, number, True)
+            dataGerente = services.text_Message_al_gerente(sett.celular_gerente, name, number, diccionarioConforme, "posiblemente interesado")
+            respuesta = services.enviar_Mensaje_whatsapp(dataGerente)
+
+        if 'gracias por considerarnos' in str.lower(text):
+            print("no interesado")
             
         respuesta = services.enviar_Mensaje_whatsapp(data)
 
