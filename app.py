@@ -1,6 +1,7 @@
 from flask import Flask, request
 import sett 
 import services
+import time
 
 app = Flask(__name__)
 
@@ -58,22 +59,29 @@ def recibir_mensajes():
         services.guardar_conversacion(messageId, number, name, text, timestamp, respuestabot)
         data = services.text_Message(number,respuestabot)
 
-        if 'buena elección' in str.lower(text):
-            print("interesado")
-            diccionarioConforme = services.generar_respuesta_chatgpt(text, number, True)
+        if 'buena elección' in str.lower(respuestabot):
+            print("ingreso a buena elección, esta interesado")
+            diccionarioConforme = services.generar_respuesta_chatgpt("estoy interesado", number, True)
             dataGerente = services.text_Message_al_gerente(sett.celular_gerente, name, number, diccionarioConforme, "interesado")
             respuesta = services.enviar_Mensaje_whatsapp(dataGerente)
+            print("saliendo del primer if")
 
-        if 'momento por favor' in str.lower(text):
-            print("posiblemente interesado")
-            diccionarioConforme = services.generar_respuesta_chatgpt(text, number, True)
+        if 'momento por favor' in str.lower(respuestabot):
+            print("ingreso a momento por favor, posiblemente interesado")
+            diccionarioConforme = services.generar_respuesta_chatgpt("estoy posiblemente interesado", number, True)
             dataGerente = services.text_Message_al_gerente(sett.celular_gerente, name, number, diccionarioConforme, "posiblemente interesado")
             respuesta = services.enviar_Mensaje_whatsapp(dataGerente)
+            print("saliendo del segundo if")
 
-        if 'gracias por considerarnos' in str.lower(text):
-            print("no interesado")
-            
+        if 'gracias por considerarnos' in str.lower(respuestabot):
+            print("ingreso a no interesado")
+            print("saliendo del tercer if")
+
+        time.sleep(2)
+
+        print("enviando data a enviar_Mensaje_whatsapp para recibir respuesta")
         respuesta = services.enviar_Mensaje_whatsapp(data)
+        print("respuesta recibida de enviar_Mensaje_whatsapp")
 
         print("saliendo de recibir_mensajes: " + str(respuesta))
         ######################################################
