@@ -178,9 +178,14 @@ def generar_respuesta_chatgpt(user_message, number, espedido=False):
       messages.append(
                         {'role':'system', 'content':'En base a lo que el usuario (que su número celular es ' + str(number) + ') este pidiendo mayor información, \
                         categorizalo como cata, cursos de cata o viajes.  \
+                        cálcula el precio total del servicio y considera si te a pedido descuento. \
                         Y devuelve una estructura de dicconario de python con los elementos:  \
-                        1) categoria, nombre del elemento"categoria"; \
-                        2) servicio, este elemento se refiere al servicio que pidio información, nombre del elemento "servicio".'},
+                        1) celular, nombre de elemento "celular"; \
+                        2) nombre completo del cliente, nombre del elemento "nombre completo"; \
+                        3) correo electronico, nombre del elemento "correo"; \
+                        4) categoria, nombre del elemento"categoria"; \
+                        5) servicio, este elemento se refiere al servicio que pidio información, nombre del elemento "servicio"; \
+                        6) precio total, nombre del elemento "precio".'},
                     )
     try:
         response = openai.ChatCompletion.create(
@@ -196,24 +201,24 @@ def generar_respuesta_chatgpt(user_message, number, espedido=False):
 
     return response.choices[0].message["content"]
 
-def text_Message_al_gerente(number_gerente, name_cliente, number_cliente, diccionarioConforme, tipo_interes):
+def text_Message_al_gerente(number, diccionarioConforme):
     print("ingresando a text_Message_al_gerente")
     
-    diccionarioConforme = diccionarioConforme.replace('\n', '')
+    diccionarioConforme = diccionarioConforme.replace('\n', '').replace(' ', '')
     diccionarioConforme = json.loads(str(diccionarioConforme))
 
     #print('Imprimiento diccionario y clave')
     #for clave, valor in diccionarioConforme.items():
     #   print(clave, valor)
 
-    text = 'Hola Victor, el cliente ' + str(name_cliente) + ' ' \
-           'con celular ' + str(number_cliente) + ', esta con un tipo de interés "' + str(tipo_interes) +'", ' \
-           'y a solicitado un servicio de ' + str(diccionarioConforme['categoria']) + ' con el detalle de ' + str(diccionarioConforme['servicio']) + ', ' \
-           'por favor coordinar.'
+    text = 'Hola Victor, el cliente ' + str(diccionarioConforme['nombrecompleto']) + ' ' \
+           'con celular ' + str(diccionarioConforme['celular']) + ' y correo ' + str(diccionarioConforme['correo']) + ' ' \
+           'a solicitado un ' + str(diccionarioConforme['categoria']) + ' con el detalle de ' + str(diccionarioConforme['servicio']) + ' ' \
+           'y precio total: ' + str(diccionarioConforme['precio']) + '.'
     
     #text = 'hola claudia...'
     
-    data = text_Message(str(number_gerente),text)
+    data = text_Message(str(number),text)
 
     print("saliendo de text_Message_al_gerente")
 

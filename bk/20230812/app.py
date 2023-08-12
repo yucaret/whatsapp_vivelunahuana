@@ -74,7 +74,6 @@ def recibir_mensajes():
             data = services.text_Message(number,'Gracias en breve se comunicarán contigo!!!')
         else:
             respuestabot = services.generar_respuesta_chatgpt(text, number, False)
-            print("dentro de recibir_mensajes: respuestabot = " + str(respuestabot))
             services.guardar_conversacion(messageId, number, name, text, timestamp, respuestabot)
             data = services.text_Message(number,respuestabot)
             
