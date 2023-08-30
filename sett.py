@@ -1,8 +1,10 @@
-token = 'bigdateros'
+import os
 
-whatsapp_token = 'ingresa whatsapp token'
+token = os.getenv("TOKEN_PERSONAL")
 
-whatsapp_url = 'ingresa whatsapp url'
+whatsapp_token = os.getenv("TOKEN_WAPP")
+
+whatsapp_url = os.getenv("WAPP_URL")
 
 stickers = {
     "poyo_feliz": 984778742532668,
