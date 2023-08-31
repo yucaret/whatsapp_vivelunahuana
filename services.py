@@ -2,6 +2,7 @@ import requests
 import sett
 import json
 import time
+import os
 
 def obtener_Mensaje_whatsapp(message):
     if 'type' not in message :
@@ -19,7 +20,7 @@ def obtener_Mensaje_whatsapp(message):
         text = message['interactive']['button_reply']['title']
     else:
         text = 'mensaje no procesado'
-        
+
     return text
 
 def enviar_Mensaje_whatsapp(data):
@@ -158,6 +159,47 @@ def sticker_Message(number, sticker_id):
     )
     return data
 
+def video_Message(number, video_file_path):
+    
+    print('dentro de video message')
+    try:
+        video_file = os.open(video_file_path, "rb")
+    except Exception as e:
+        print('error: ' + str(e))
+
+    print('cargamos el video')
+
+    data = json.dumps(
+        {
+            "messaging_product": "whatsapp",
+            "recipient_type": "individual",
+            "to": number,
+            "type": "video",
+            "video": {
+                "file": video_file
+            }
+        }
+    )
+
+    print('cargamos la data')
+
+    return data
+
+def quickreply_Message(number, quickreplyId):
+    
+    data = json.dumps(
+        {
+            "messaging_product": "whatsapp",
+            "recipient_type": "individual",
+            "to": number,
+            "type": "quick_reply",
+            "quick_reply": {  # Nombre correcto de la clave
+                "id": quickreplyId
+            }
+        }
+    )
+    return data
+
 def get_media_id(media_name , media_type):
     media_id = ""
     if media_type == "sticker":
@@ -211,6 +253,7 @@ def markRead_Message(messageId):
     return data
 
 def administrar_chatbot(text,number, messageId, name):
+    pie_pagina = "Team Vive Lunahuana!!!"
     text = text.lower() #mensaje que envio el usuario
     list = []
     print("mensaje del usuario: ",text)
@@ -220,33 +263,133 @@ def administrar_chatbot(text,number, messageId, name):
     time.sleep(2)
 
     if "hola" in text:
-        body = "¡Hola! 👋 Bienvenido a Bigdateros. ¿Cómo podemos ayudarte hoy?"
-        footer = "Equipo Bigdateros"
-        options = ["✅ servicios", "📅 agendar cita"]
+        footer = pie_pagina
 
-        replyButtonData = buttonReply_Message(number, options, body, footer, "sed1",messageId)
+        # reaccion al mensaje
         replyReaction = replyReaction_Message(number, messageId, "🫡")
-        list.append(replyReaction)
-        list.append(replyButtonData)
+        enviar_Mensaje_whatsapp(replyReaction)
+        time.sleep(2)
 
-    elif "servicios" in text:
+        # mensaje de inicio
+        texto_ = '¡Hola! Soy Claudia, del equipo Vive Lunahuaná. 🌿🐾 Descubre una increíble experiencia vivencial en ' \
+                 'una nuestro fundo con piscina de 1000m2 en Lunahuaná, donde disfrutarás de la naturaleza al máximo. ¡Somos pet-friendly! 🐶.\n\n' \
+                 'Estamos a solo 5 cuadras de la Plaza de Lunahuaná. 😊🐶 ¿Listo para vivir momentos inolvidables rodeado de la naturaleza con '\
+                 'toda la familia o pareja👩❤️‍👨?'
+        textMessage = text_Message(number, texto_)
+        enviar_Mensaje_whatsapp(textMessage)
+
+        time.sleep(2)
+
+        # lista de opciones
+        body = 'Solo  recibimos a 2 grupos familiares, tenemos paquetes para grupos de:'
+
+        footer = pie_pagina
+
+        options = ["hasta 3 personas", "hasta 6 u 8 pers.", "hasta 10 u 18 pers."]
+
+        replyButtonData = buttonReply_Message(number, options, body, footer, "sed1", messageId)
+        enviar_Mensaje_whatsapp(replyButtonData)
+
+    elif "hasta 10 u 18 pers" in text:
+        # mensaje
+        texto_ = 'Nuestro depa equipado cuenta con un estilo minimalista y siempre rodeado de plantas. Disfruta de una vista increíble\n\n' \
+                 'En este link puedes ver nuestras fotos y distribución:\n👉https://n9.cl/depavivelunahuana👈\n\n' \
+                 'Estamos a solo 5 cuadras de la Plaza de Lunahuaná. 😊🐶 ¿Listo para vivir momentos inolvidables rodeado de la naturaleza '\
+                 'con toda la familia?'
+
+        textMessage = text_Message(number, texto_)
+        enviar_Mensaje_whatsapp(textMessage)
+
+        time.sleep(2)
+
+        # lista de opciones
+        body = 'Cuéntanos qué paquete te interesa:'
+
+        footer = pie_pagina
+
+        options = ["Fin de semana🙌", "Durante semana🌿", "Elegir una fecha"]
+
+        replyButtonData = buttonReply_Message(number, options, body, footer, "sed1", messageId)
+
+        enviar_Mensaje_whatsapp(replyButtonData)
+
+    elif "fin de semana" in text:
+        # mensaje
+        texto_ = 'Súper! Tenemos activa nuestra Promo 😎ESCAPADA, te envío la info completa y videos de la experiencia 🌿☺️...'
+
+        textMessage = text_Message(number, texto_)
+        enviar_Mensaje_whatsapp(textMessage)
+
+        time.sleep(2)
+
+        # envio de video
+        print("ingreso a video message")
+        videoMessage = video_Message(number, '/root/wharsapp_vivelunahuana/vivelunahuana_depa_kaori.mp4')
+        print("cargo el videomessage")
+        enviar_Mensaje_whatsapp(videoMessage)
+        print("envio el mensaje de video")
+        time.sleep(2)
+
+        texto_ = 'Envío un video (el video del depa con kao)'
+
+        textMessage = text_Message(number, texto_)
+        enviar_Mensaje_whatsapp(textMessage)
+
+        time.sleep(2)
+
+        # envio mensaje
+        texto_ = "Fotos de nuestro jardín y piscina rodeada de árboles , un ambiente ideal para  conectar con la naturaleza 😊🍀"
+
+        textMessage = text_Message(number, texto_)
+        enviar_Mensaje_whatsapp(textMessage)
+
+        time.sleep(2)
+
+        # envio fotos
+        texto_ = "Envío fotos de jardín y piscina"
+
+        textMessage = text_Message(number, texto_)
+        enviar_Mensaje_whatsapp(textMessage)
+
+        time.sleep(2)
+
+        # envio mensaje
+        texto_ = 'Tu estadía incluye emocionantes actividades de turismo vivencial. 🌿👩🌾\n' \
+                 '1.-Descubre nuestro BioHuertos, 🥑🍊🌱en un recorrido guiado y cosecha de frutos de temporada.\n' \
+                 '2.-Explora la belleza del puente colgante San Lorenzo, ☀️ubicado a solo 5 minutos en carro.\n'\
+                 'Nos trasladaremos en la movilidad de nuestros huéspedes, brindándote comodidad y acceso a bellos paisajes naturales.\n'\
+                 '3. Aprende la historia y proceso de producción mientras disfrutas de una degustación de vinos y pisco en la Bodega.🍷🍇'
+
+        textMessage = text_Message(number, texto_)
+        enviar_Mensaje_whatsapp(textMessage)
+
+        time.sleep(2)
+
+        # envio mensaje
+        texto_ = 'Como gesto de bienvenida, te obsequiamos leña para una fogata mágica bajo las estrellas🪵🔥🌟'
+        textMessage = text_Message(number, texto_)
+        enviar_Mensaje_whatsapp(textMessage)
+
+        time.sleep(2)
+
+        # envio mensaje
+        texto_ = 'Visita este enlace para ver fotos de las actividades. 📸🏞'\
+                 '👉 bit.ly/actividadesvivelunahuana\n\n¡No pierdas la oportunidad de conectarte plenamente con la naturaleza en Vive Lunahuaná!🫶☀️'
+        textMessage = text_Message(number, texto_)
+        enviar_Mensaje_whatsapp(textMessage)
+
+    elif "hasta 3 personas" in text:
         body = "Tenemos varias áreas de consulta para elegir. ¿Cuál de estos servicios te gustaría explorar?"
         footer = "Equipo Bigdateros"
-        options = ["Analítica Avanzada", "Migración Cloud", "Inteligencia de Negocio"]
+        options = ["Analítica Avanzada", "Migración Cloud", "Inteligencia de Negocio", "xxxx", "yyyy", "zzzz"]
 
         listReplyData = listReply_Message(number, options, body, footer, "sed2",messageId)
         sticker = sticker_Message(number, get_media_id("perro_traje", "sticker"))
 
         list.append(listReplyData)
         list.append(sticker)
-    elif "inteligencia de negocio" in text:
-        body = "Buenísima elección. ¿Te gustaría que te enviara un documento PDF con una introducción a nuestros métodos de Inteligencia de Negocio?"
-        footer = "Equipo Bigdateros"
-        options = ["✅ Sí, envía el PDF.", "⛔ No, gracias"]
-
-        replyButtonData = buttonReply_Message(number, options, body, footer, "sed3",messageId)
-        list.append(replyButtonData)
-    elif "sí, envía el pdf" in text:
+    #elif "sí, envía el pdf" in text:
+    elif "hasta 6 u 8 pers." in text:
         sticker = sticker_Message(number, get_media_id("pelfet", "sticker"))
         textMessage = text_Message(number,"Genial, por favor espera un momento.")
 
@@ -254,33 +397,33 @@ def administrar_chatbot(text,number, messageId, name):
         enviar_Mensaje_whatsapp(textMessage)
         time.sleep(3)
 
-        document = document_Message(number, sett.document_url, "Listo 👍🏻", "Inteligencia de Negocio.pdf")
+        #document = document_Message(number, sett.document_url, "Listo 👍🏻", "Inteligencia de Negocio.pdf")
+        document = document_Message(number, sett.document_url, "Listo!!!", "recibo.pdf")
         enviar_Mensaje_whatsapp(document)
         time.sleep(3)
 
         body = "¿Te gustaría programar una reunión con uno de nuestros especialistas para discutir estos servicios más a fondo?"
-        footer = "Equipo Bigdateros"
+        footer = pie_pagina
         options = ["✅ Sí, agenda reunión", "No, gracias." ]
 
         replyButtonData = buttonReply_Message(number, options, body, footer, "sed4",messageId)
         list.append(replyButtonData)
     elif "sí, agenda reunión" in text :
         body = "Estupendo. Por favor, selecciona una fecha y hora para la reunión:"
-        footer = "Equipo Bigdateros"
+        footer = pie_pagina
         options = ["📅 10: mañana 10:00 AM", "📅 7 de junio, 2:00 PM", "📅 8 de junio, 4:00 PM"]
 
         listReply = listReply_Message(number, options, body, footer, "sed5",messageId)
         list.append(listReply)
     elif "7 de junio, 2:00 pm" in text:
         body = "Excelente, has seleccionado la reunión para el 7 de junio a las 2:00 PM. Te enviaré un recordatorio un día antes. ¿Necesitas ayuda con algo más hoy?"
-        footer = "Equipo Bigdateros"
+        footer = pie_pagina
         options = ["✅ Sí, por favor", "❌ No, gracias."]
-
 
         buttonReply = buttonReply_Message(number, options, body, footer, "sed6",messageId)
         list.append(buttonReply)
     elif "no, gracias." in text:
-        textMessage = text_Message(number,"Perfecto! No dudes en contactarnos si tienes más preguntas. Recuerda que también ofrecemos material gratuito para la comunidad. ¡Hasta luego! 😊")
+        textMessage = text_Message(number,"Perfecto! No dudes en contactarnos si tienes más preguntas. Recuerda que también ofrecemos material gratuito para la comunidad. ¡Hasta luego! :)")
         list.append(textMessage)
     else :
         data = text_Message(number,"Lo siento, no entendí lo que dijiste. ¿Quieres que te ayude con alguna de estas opciones?")
